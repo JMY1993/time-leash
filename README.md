@@ -92,6 +92,41 @@ const result = await timing.max(async (signal) => {
 console.log(result); // 'slow result' or 'fallback'
 ```
 
+## Tree-Shaking Support
+
+This library is fully tree-shakable, allowing you to reduce your bundle size by only including the specific functions you use. You can import just what you need:
+
+### Standard API (Recommended for Most Users)
+
+```typescript
+import { timing } from 'time-leash';
+
+// Use all functions
+const exact = await timing(() => operation(), fallback, duration);
+const minimum = await timing.min(() => operation(), minDuration);
+const maximum = await timing.max(() => operation(), fallback, maxDuration);
+```
+
+### Tree-Shakable Imports (Optimized Bundle Size)
+
+```typescript
+// Import only what you need
+import { min } from 'time-leash';
+
+// This will exclude the exact and max functions from your bundle
+const result = await min(() => operation(), 1000);
+```
+
+Or import multiple specific functions:
+
+```typescript
+import { exact, max } from 'time-leash';
+
+// Only exact and max will be included in your bundle
+const result1 = await exact(() => operation(), fallback, 300);
+const result2 = await max(() => operation(), fallback, 200);
+```
+
 ## Timing Precision and Limitations
 
 While `time-leash` strives to provide precise timing control, it is important to note that JavaScript's `setTimeout` and `performance.now()` are subject to system-level limitations. These include:

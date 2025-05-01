@@ -1,1 +1,1 @@
-export { timing } from './timing';
+export { timing, exact, min, max } from './timing';
