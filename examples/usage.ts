@@ -5,7 +5,7 @@ const hashPassword = async (password: string) => {
   return `hashed_${password}`;
 };
 (async () => {
-  const result = await timing(() => hashPassword('my_password'), undefined, 500);
+  const result = await timing(() => hashPassword('my_password'), 500);
   console.log('Consistent Timing Example:', result); // Always takes 500ms
 })();
 
@@ -23,6 +23,6 @@ const longRunningTask = async (signal?: AbortSignal) => {
   return new Promise((resolve) => setTimeout(() => resolve('done'), 5000));
 };
 (async () => {
-  const result = await timing.max(longRunningTask, 'timeout', 2000);
+  const result = await timing.max(longRunningTask, 2000, 'timeout');
   console.log('Maximum Execution Time Example:', result); // Returns 'timeout' after 2000ms
 })();

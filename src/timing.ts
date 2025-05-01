@@ -4,13 +4,13 @@ const DEFAULT_DETENTION_PERIOD = 250;
 /**
  * Ensures a function executes for EXACTLY the specified duration
  * @param fn Function to execute with precise timing
- * @param fallbackValue Value to return if execution exceeds time limit
  * @param duration Exact execution time in milliseconds
+ * @param fallbackValue Value to return if execution exceeds time limit
  */
 export async function exact<T>(
   fn: () => Promise<T>, 
-  fallbackValue?: T, 
-  duration: number = DEFAULT_DETENTION_PERIOD
+  duration: number = DEFAULT_DETENTION_PERIOD,
+  fallbackValue?: T
 ): Promise<T> {
   const startTime = performance.now();
   
@@ -77,13 +77,13 @@ export async function min<T>(
  * Ensures a function executes for AT MOST the specified duration
  * Intelligently aborts if function supports AbortSignal
  * @param fn Function to execute with maximum timing
- * @param fallbackValue Value to return if execution exceeds time limit
  * @param maxDuration Maximum execution time in milliseconds
+ * @param fallbackValue Value to return if execution exceeds time limit
  */
 export async function max<T>(
   fn: ((signal?: AbortSignal) => Promise<T>),
-  fallbackValue?: T,
-  maxDuration: number = DEFAULT_DETENTION_PERIOD
+  maxDuration: number = DEFAULT_DETENTION_PERIOD,
+  fallbackValue?: T
 ): Promise<T> {
   // Create AbortController to allow cancellation
   const controller = new AbortController();

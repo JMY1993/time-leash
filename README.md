@@ -26,14 +26,14 @@ pnpm add time-leash
 
 ## Usage
 
-### `timing(fn, fallbackValue?, duration?)`
+### `timing(fn, duration?, fallbackValue?)`
 
 Executes a function and ensures it runs for exactly the specified duration. If the function completes early, it waits for the remaining time. If it exceeds the duration, it either returns a fallback value or throws an error.
 
 #### Parameters
 - `fn: () => Promise<T>` - The asynchronous function to execute.
-- `fallbackValue?: T` - The value to return if the function exceeds the time limit.
 - `duration?: number` - The exact execution time in milliseconds (default: 250ms).
+- `fallbackValue?: T` - The value to return if the function exceeds the time limit.
 
 #### Example
 ```typescript
@@ -42,7 +42,7 @@ import { timing } from 'time-leash';
 const result = await timing(async () => {
   // Your async operation
   return 'success';
-}, 'fallback', 300);
+}, 300, 'fallback');
 
 console.log(result); // 'success' or 'fallback'
 ```
@@ -67,14 +67,14 @@ const result = await timing.min(async () => {
 console.log(result); // 'quick result'
 ```
 
-### `timing.max(fn, fallbackValue?, maxDuration?)`
+### `timing.max(fn, maxDuration?, fallbackValue?)`
 
 Ensures a function runs for at most the specified duration. If the function exceeds the time limit, it either returns a fallback value or throws an error. Supports `AbortSignal` for cancellation.
 
 #### Parameters
 - `fn: (signal?: AbortSignal) => Promise<T>` - The asynchronous function to execute. Optionally accepts an `AbortSignal` for cancellation.
-- `fallbackValue?: T` - The value to return if the function exceeds the time limit.
 - `maxDuration?: number` - The maximum execution time in milliseconds (default: 250ms).
+- `fallbackValue?: T` - The value to return if the function exceeds the time limit.
 
 ### Note on Non-Abortable Functions
 
@@ -87,7 +87,7 @@ import { timing } from 'time-leash';
 const result = await timing.max(async (signal) => {
   // Your async operation
   return 'slow result';
-}, 'fallback', 300);
+}, 300, 'fallback');
 
 console.log(result); // 'slow result' or 'fallback'
 ```
@@ -102,9 +102,9 @@ This library is fully tree-shakable, allowing you to reduce your bundle size by 
 import { timing } from 'time-leash';
 
 // Use all functions
-const exact = await timing(() => operation(), fallback, duration);
+const exact = await timing(() => operation(), duration, fallback);
 const minimum = await timing.min(() => operation(), minDuration);
-const maximum = await timing.max(() => operation(), fallback, maxDuration);
+const maximum = await timing.max(() => operation(), maxDuration, fallback);
 ```
 
 ### Tree-Shakable Imports (Optimized Bundle Size)
@@ -123,8 +123,8 @@ Or import multiple specific functions:
 import { exact, max } from 'time-leash';
 
 // Only exact and max will be included in your bundle
-const result1 = await exact(() => operation(), fallback, 300);
-const result2 = await max(() => operation(), fallback, 200);
+const result1 = await exact(() => operation(), 300, fallback);
+const result2 = await max(() => operation(), 200, fallback);
 ```
 
 ## Timing Precision and Limitations
@@ -161,7 +161,7 @@ const hashPassword = async (password: string) => {
   return `hashed_${password}`;
 };
 
-const result = await timing(() => hashPassword('my_password'), undefined, 500);
+const result = await timing(() => hashPassword('my_password'), 500);
 console.log(result); // Always takes 500ms
 ```
 
@@ -195,7 +195,7 @@ const longRunningTask = async (signal?: AbortSignal) => {
   return new Promise((resolve) => setTimeout(() => resolve('done'), 5000));
 };
 
-const result = await timing.max(longRunningTask, 'timeout', 2000);
+const result = await timing.max(longRunningTask, 2000, 'timeout');
 console.log(result); // Returns 'timeout' after 2000ms
 ```
 
@@ -212,7 +212,7 @@ const processInput = async (input: string) => {
   return `processed_${input}`;
 };
 
-const throttledInput = await timing(() => processInput('user_input'), undefined, 100);
+const throttledInput = await timing(() => processInput('user_input'), 100);
 console.log(throttledInput); // Ensures processing takes exactly 100ms
 ```
 
@@ -229,7 +229,7 @@ const fetchMockData = async () => {
   return { data: 'mock_data' };
 };
 
-const simulatedLatency = await timing(() => fetchMockData(), undefined, 1000);
+const simulatedLatency = await timing(() => fetchMockData(), 1000, undefined);  // you don't need to specifically pass undefined, this is just for clarity
 console.log(simulatedLatency); // Simulates a 1000ms network delay
 ```
 
@@ -246,7 +246,7 @@ const queryDatabase = async (signal?: AbortSignal) => {
   return new Promise((resolve) => setTimeout(() => resolve('query_result'), 5000));
 };
 
-const result = await timing.max(queryDatabase, 'timeout', 2000);
+const result = await timing.max(queryDatabase, 2000, 'timeout');
 console.log(result); // Returns 'timeout' if the query exceeds 2000ms
 ```
 
@@ -282,7 +282,7 @@ const animateFrame = async (frame: number) => {
 };
 
 for (let i = 0; i < 10; i++) {
-  await timing(() => animateFrame(i), undefined, 100);
+  await timing(() => animateFrame(i), 100, undefined); // you don't need to specifically pass undefined, this is just for clarity
 }
 ```
 

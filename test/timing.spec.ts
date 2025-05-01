@@ -29,7 +29,7 @@ describe('timing, as exact', () => {
         const fn = async () => 'success';
 
         // Start the function execution
-        const promise = timing(fn, 'fallback', 200);
+        const promise = timing(fn, 200, 'fallback');
 
         // Advance time to simulate function completion
         vi.advanceTimersByTime(100);
@@ -49,7 +49,7 @@ describe('timing, as exact', () => {
     it('should enforce minimum execution time by waiting', async () => {
         const fn = async () => 'quick result';
 
-        const promise = timing(fn, undefined, 250);
+        const promise = timing(fn, 250, undefined); // You don't need to explicitly pass undefined, this is just for clarity in the test
 
         // Fast-forward timers
         vi.runAllTimers();
@@ -67,7 +67,7 @@ describe('timing, as exact', () => {
             setTimeout(() => resolve('slow result'), 300);
         });
 
-        const promise = timing(slowFn, 'fallback', 200);
+        const promise = timing(slowFn, 200, 'fallback');
 
         // Fast-forward by just over the timeout
         vi.advanceTimersByTime(201);
@@ -85,7 +85,7 @@ describe('timing, as exact', () => {
             setTimeout(() => resolve('slow result'), 300);
         });
 
-        const promise = timing(slowFn, undefined, 200);
+        const promise = timing(slowFn, 200);
 
         // Fast-forward by just over the timeout
         vi.advanceTimersByTime(201);
@@ -127,7 +127,6 @@ describe('timing, as exact', () => {
 
             await timing(
                 async () => 'fast operation',
-                undefined,
                 minTime
             );
 
@@ -141,8 +140,8 @@ describe('timing, as exact', () => {
 
             const result = await timing(
                 () => new Promise(resolve => setTimeout(() => resolve('slow'), 100)),
-                'fallback',
-                timeout
+                timeout,
+                'fallback'
             );
 
             expect(result).toBe('fallback');
@@ -330,7 +329,7 @@ describe('timing.max', () => {
     it('should return result when function completes within time limit', async () => {
         const fn = async () => 'fast enough';
 
-        const promise = timing.max(fn, 'fallback', 200);
+        const promise = timing.max(fn, 200, 'fallback');
 
         // Function completes within time
         vi.advanceTimersByTime(100);
@@ -344,7 +343,7 @@ describe('timing.max', () => {
             setTimeout(() => resolve('too slow'), 300);
         });
 
-        const promise = timing.max(slowFn, 'fallback value', 200);
+        const promise = timing.max(slowFn, 200, 'fallback value');
 
         // Fast-forward beyond the timeout
         vi.advanceTimersByTime(201);
@@ -358,7 +357,7 @@ describe('timing.max', () => {
             setTimeout(() => resolve('too slow'), 300);
         });
 
-        const promise = timing.max(slowFn, undefined, 200);
+        const promise = timing.max(slowFn, 200);
 
         // Fast-forward beyond the timeout
         vi.advanceTimersByTime(201);
@@ -384,7 +383,7 @@ describe('timing.max', () => {
             setTimeout(() => resolve('exact timing'), 200);
         });
 
-        const promise = timing.max(exactFn, 'fallback', 200);
+        const promise = timing.max(exactFn, 200, 'fallback');
 
         // Fast-forward to exactly the timeout
         vi.advanceTimersByTime(200);
@@ -407,8 +406,8 @@ describe('timing.max', () => {
         it('should return result for quick operations', async () => {
             const result = await timing.max(
                 async () => 'quick max operation',
-                'fallback',
-                100
+                100,
+                'fallback'
             );
 
             expect(result).toBe('quick max operation');
@@ -420,8 +419,8 @@ describe('timing.max', () => {
 
             const result = await timing.max(
                 () => new Promise(resolve => setTimeout(() => resolve('way too slow'), 150)),
-                'real fallback',
-                timeout
+                timeout,
+                'real fallback'
             );
 
             const executionTime = Date.now() - startTime;
@@ -432,7 +431,6 @@ describe('timing.max', () => {
         it('should throw error with no fallback in real timers', async () => {
             await expect(timing.max(
                 () => new Promise(resolve => setTimeout(() => resolve('slow'), 100)),
-                undefined,
                 50
             )).rejects.toThrow('Function execution exceeded time limit');
         }, 1000);
@@ -460,7 +458,7 @@ describe('timing.max with abort functionality', () => {
     it('should call function with an AbortSignal', async () => {
         const mockFn = vi.fn().mockResolvedValue('result');
 
-        await timing.max(mockFn, 'fallback', 200);
+        await timing.max(mockFn, 200, 'fallback');
 
         // Assert the function was called with an AbortSignal
         expect(mockFn).toHaveBeenCalledTimes(1);
@@ -482,7 +480,7 @@ describe('timing.max with abort functionality', () => {
             setTimeout(() => resolve('too slow'), 300);
         });
 
-        const promise = timing.max(slowFn, 'fallback value', 200);
+        const promise = timing.max(slowFn, 200, 'fallback value');
 
         // Fast-forward beyond the timeout
         vi.advanceTimersByTime(201);
@@ -511,7 +509,7 @@ describe('timing.max with abort functionality', () => {
         // Use real timers since fake timers are causing issues
         vi.useRealTimers();
         
-        const result = await timing.max(manualCheckFn, 'manual check fallback', 50);
+        const result = await timing.max(manualCheckFn, 50, 'manual check fallback');
         
         expect(result).toBe('manual check fallback');
     }, 2000); // Increase timeout
@@ -558,8 +556,8 @@ describe('timing.max with abort functionality', () => {
                     const response = await fetch('https://example.com/api', { signal });
                     return response.json();
                 },
-                { success: false },
-                50
+                50,
+                { success: false }
             );
             
             // Verify we got the fallback
@@ -597,8 +595,8 @@ describe('timing.max with abort functionality', () => {
                     }
                 }, 300);
             }),
-            'aborted early',
-            50
+            50,
+            'aborted early'
         );
         
         expect(result).toBe('aborted early');
