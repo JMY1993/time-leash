@@ -30,6 +30,9 @@
   "author": "",
   "license": "MIT",
   "packageManager": "pnpm@10.9.0",
+  "files": [
+    "dist"
+  ],
   "devDependencies": {
     "@rollup/plugin-typescript": "^12.1.2",
     "@types/node": "^22.15.3",
