@@ -22,9 +22,13 @@
     "test": "vitest run --config vitest.config.ts",
     "test:watch": "vitest --config vitest.config.ts"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JMY1993/time-leash"
+  },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "packageManager": "pnpm@10.9.0",
   "devDependencies": {
     "@rollup/plugin-typescript": "^12.1.2",
